@@ -1,0 +1,21 @@
+
+export GOCACHE=/tmp/go-build
+export GOPATH=/tmp/gopath
+export GOROOT_BOOTSTRAP={{.GoBootPath}}
+
+override_dh_auto_clean:
+
+override_dh_auto_build:
+
+	(mv .go ../ && cd ../.go/src && ./make.bash)
+
+
+	mkdir -p $(GOPATH)/pkg
+	mv .mod $(GOPATH)/pkg/mod
+
+	../.go/bin/go run build/ci.go install -git-commit={{.Env.Commit}} -git-branch={{.Env.Branch}} -git-tag={{.Env.Tag}} -buildnum={{.Env.Buildnum}} -pull-request={{.Env.IsPullRequest}}
+
+override_dh_auto_test:
+
+%:
+	dh $@
